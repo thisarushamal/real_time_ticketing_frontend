@@ -1,0 +1,41 @@
+.configuration-form {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.configuration-form h3 {
+    margin-top: 0;
+}
+
+.configuration-form div {
+    margin-bottom: 10px;
+}
+
+.configuration-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.configuration-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.configuration-form button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.configuration-form button:hover {
+    background-color: #45a049;
+}
