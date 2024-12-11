@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { updateConfig } from '../api';
+import { updateConfig } from '../../src/api';
 import '../../src/assets/CSS/ConfigurationForm.css';
 
 const ConfigurationForm = ({ addLog }) => {
@@ -7,12 +7,29 @@ const ConfigurationForm = ({ addLog }) => {
     const [releaseRate, setReleaseRate] = useState('');
     const [retrievalRate, setRetrievalRate] = useState('');
     const [maxCapacity, setMaxCapacity] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = async () => {
-        if (Number(totalTickets) > Number(maxCapacity)) {
-            addLog('Error: Total tickets cannot exceed max capacity.');
-            return;
+    const validateInputs = () => {
+        if (!totalTickets || !releaseRate || !retrievalRate || !maxCapacity) {
+            addLog('Error: All fields are required');
+            return false;
         }
+        if (Number(totalTickets) <= 0 || Number(releaseRate) <= 0 || 
+            Number(retrievalRate) <= 0 || Number(maxCapacity) <= 0) {
+            addLog('Error: All values must be positive numbers');
+            return false;
+        }
+        if (Number(totalTickets) > Number(maxCapacity)) {
+            addLog('Error: Total tickets cannot exceed max capacity');
+            return false;
+        }
+        return true;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        if (!validateInputs()) return;
 
         const newConfig = {
             totalTickets: Number(totalTickets),
@@ -21,35 +38,74 @@ const ConfigurationForm = ({ addLog }) => {
             maxTicketCapacity: Number(maxCapacity),
         };
 
+        setIsSubmitting(true);
         try {
-            const { data } = await updateConfig(newConfig);
-            addLog(data.message);
+            const response = await updateConfig(newConfig);
+            addLog('Configuration updated successfully');
+            // Clear form after successful submission
+            setTotalTickets('');
+            setReleaseRate('');
+            setRetrievalRate('');
+            setMaxCapacity('');
         } catch (error) {
-            addLog('Failed to update configuration: ' + error.response.data.message);
+            const errorMessage = error.response?.data?.message || 'Failed to update configuration';
+            addLog(`Error: ${errorMessage}`);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="configuration-form">
+        <form className="configuration-form" onSubmit={handleSubmit}>
             <h3>Configuration Form</h3>
             <div>
                 <label>Total Tickets:</label>
-                <input type="number" value={totalTickets} onChange={(e) => setTotalTickets(e.target.value)} />
+                <input 
+                    type="number" 
+                    value={totalTickets} 
+                    onChange={(e) => setTotalTickets(e.target.value)}
+                    min="1"
+                    required
+                    disabled={isSubmitting}
+                />
             </div>
             <div>
-                <label>Release Rate:</label>
-                <input type="number" value={releaseRate} onChange={(e) => setReleaseRate(e.target.value)} />
+                <label>Release Rate (tickets/min):</label>
+                <input 
+                    type="number" 
+                    value={releaseRate} 
+                    onChange={(e) => setReleaseRate(e.target.value)}
+                    min="1"
+                    required
+                    disabled={isSubmitting}
+                />
             </div>
             <div>
-                <label>Retrieval Rate:</label>
-                <input type="number" value={retrievalRate} onChange={(e) => setRetrievalRate(e.target.value)} />
+                <label>Retrieval Rate (tickets/min):</label>
+                <input 
+                    type="number" 
+                    value={retrievalRate} 
+                    onChange={(e) => setRetrievalRate(e.target.value)}
+                    min="1"
+                    required
+                    disabled={isSubmitting}
+                />
             </div>
             <div>
                 <label>Max Capacity:</label>
-                <input type="number" value={maxCapacity} onChange={(e) => setMaxCapacity(e.target.value)} />
+                <input 
+                    type="number" 
+                    value={maxCapacity} 
+                    onChange={(e) => setMaxCapacity(e.target.value)}
+                    min="1"
+                    required
+                    disabled={isSubmitting}
+                />
             </div>
-            <button onClick={handleSubmit}>Save Configuration</button>
-        </div>
+            <button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Save Configuration'}
+            </button>
+        </form>
     );
 };
 

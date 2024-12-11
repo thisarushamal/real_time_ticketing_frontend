@@ -16,7 +16,7 @@ const App = () => {
             <h1>Real-Time Ticketing System</h1>
             <div className="grid-container">
                 <ConfigurationForm addLog={addLog} />
-                <TicketDisplay addLog={addLog} />
+                <TicketDisplay addLog={addLog} isRunning={isRunning} />
             </div>
             <ControlPanel isRunning={isRunning} setIsRunning={setIsRunning} addLog={addLog} />
             <LogDisplay logs={logs} />

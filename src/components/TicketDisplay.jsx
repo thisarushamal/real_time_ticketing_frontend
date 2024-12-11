@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getStatus } from '../api';
 import '../../src/assets/CSS/TicketDisplay.css';
 
-const TicketDisplay = ({ addLog }) => {
+const TicketDisplay = ({ addLog, isRunning }) => {
     const [status, setStatus] = useState({ availableTickets: 0, tickets: [] });
 
     useEffect(() => {
@@ -15,8 +15,20 @@ const TicketDisplay = ({ addLog }) => {
                 addLog('Failed to fetch ticket status.');
             }
         };
-        fetchStatus();
-    }, [addLog]);
+
+        let intervalId;
+        if (isRunning) {
+            fetchStatus(); // Initial fetch
+            intervalId = setInterval(fetchStatus, 1000); // Fetch every 1 second
+        }
+
+        // Cleanup function to clear interval when component unmounts or isRunning changes
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [isRunning, addLog]); // Dependencies include isRunning to restart interval when it changes
 
     return (
         <div className="ticket-display">
