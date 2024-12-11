@@ -1,7 +1,8 @@
 .ticket-display {
     border: 1px solid #ccc;
     padding: 20px;
-    border-radius: 5px;
+    margin-top: 1em;
+    border-radius: 7px;
     background-color: #fff;
     text-align: center;
 }

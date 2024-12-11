@@ -1,8 +1,9 @@
+/* log display */
 .log-display {
     margin-top: 20px;
     border: 1px solid #ccc;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 7px;
     background-color: #fff;
 }
 
@@ -15,7 +16,7 @@
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: 400px;
+    max-height: 150px;
     overflow-y: auto;
     scrollbar-width: thin;
 }
@@ -32,7 +33,7 @@
     border-bottom: none;
 }
 
-/* Custom scrollbar styling for webkit browsers */
+/* scrollbar */
 .log-display ul::-webkit-scrollbar {
     width: 6px;
 }

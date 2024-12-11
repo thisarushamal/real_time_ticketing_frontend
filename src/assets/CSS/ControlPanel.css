@@ -13,7 +13,6 @@
 }
 
 .control-panel button:disabled {
-    cursor: not-allowed;
     background-color: #ccc;
     color: #666;
 }

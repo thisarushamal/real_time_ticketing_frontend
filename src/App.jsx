@@ -11,7 +11,7 @@ const App = () => {
 
     const addLog = useCallback((message) => {
         setLogs((prevLogs) => [...prevLogs, message]);
-    }, []); // Empty dependency array since it only uses setLogs which is stable
+    }, []);
 
     return (
         <div className="app">

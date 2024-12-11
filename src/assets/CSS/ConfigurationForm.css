@@ -1,7 +1,8 @@
 .configuration-form {
+    position: relative;
     border: 1px solid #ccc;
     padding: 20px;
-    border-radius: 5px;
+    border-radius: 7px;
     background-color: #fff;
 }
 
@@ -38,4 +39,17 @@
 
 .configuration-form button:hover {
     background-color: #45a049;
+}
+
+.form-group {
+    color: rgb(56, 54, 54);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    box-sizing: border-box;
+    background-color: #b7b4b4;
 }
