@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import ConfigurationForm from './components/ConfigurationForm';
 import TicketDisplay from './components/TicketDisplay';
 import ControlPanel from './components/ControlPanel';
@@ -9,7 +9,9 @@ const App = () => {
     const [logs, setLogs] = useState([]);
     const [isRunning, setIsRunning] = useState(false);
 
-    const addLog = (message) => setLogs((prevLogs) => [...prevLogs, message]);
+    const addLog = useCallback((message) => {
+        setLogs((prevLogs) => [...prevLogs, message]);
+    }, []); // Empty dependency array since it only uses setLogs which is stable
 
     return (
         <div className="app">

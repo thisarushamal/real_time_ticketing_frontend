@@ -1,16 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { getStatus } from '../api';
 import '../../src/assets/CSS/TicketDisplay.css';
 
 const TicketDisplay = ({ addLog, isRunning }) => {
     const [status, setStatus] = useState({ availableTickets: 0, tickets: [] });
+    const lastUpdateTime = useRef(0);
 
     useEffect(() => {
         const fetchStatus = async () => {
+            const now = Date.now();
+            // Ensure at least 1000ms has passed since the last update
+            if (now - lastUpdateTime.current < 1000) {
+                return;
+            }
+
             try {
                 const { data } = await getStatus();
                 setStatus(data);
                 addLog(`Ticket Status Updated: ${data.availableTickets} tickets available.`);
+                lastUpdateTime.current = now;
             } catch (error) {
                 addLog('Failed to fetch ticket status.');
             }
@@ -28,7 +36,7 @@ const TicketDisplay = ({ addLog, isRunning }) => {
                 clearInterval(intervalId);
             }
         };
-    }, [isRunning, addLog]); // Dependencies include isRunning to restart interval when it changes
+    }, [isRunning]); // Only depend on isRunning state
 
     return (
         <div className="ticket-display">
