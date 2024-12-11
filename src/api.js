@@ -5,6 +5,6 @@ const API = axios.create({
 });
 
 export const getStatus = () => API.get('/status');
-export const addTickets = (vendorId, count) => API.post('/vendor/add', { vendorId, count });
-export const purchaseTickets = (customerId, count) => API.post('/customer/buy', { customerId, count });
-export const updateConfig = (newConfig) => API.post('/config', newConfig);
+export const startSystem = () => API.post('/start');
+export const stopSystem = () => API.post('/stop');
+export const updateConfig = (config) => API.post('/config', config);

@@ -1,111 +1,137 @@
 import React, { useState } from 'react';
-import { updateConfig } from '../../src/api';
-import '../../src/assets/CSS/ConfigurationForm.css';
+import { updateConfig } from '../api';
+import '../assets/CSS/ConfigurationForm.css';
 
 const ConfigurationForm = ({ addLog }) => {
-    const [totalTickets, setTotalTickets] = useState('');
-    const [releaseRate, setReleaseRate] = useState('');
-    const [retrievalRate, setRetrievalRate] = useState('');
-    const [maxCapacity, setMaxCapacity] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [config, setConfig] = useState({
+        totalTickets: '',
+        ticketReleaseRate: '',
+        customerRetrievalRate: '',
+        maxTicketCapacity: ''
+    });
+    const [errors, setErrors] = useState({});
 
-    const validateInputs = () => {
-        if (!totalTickets || !releaseRate || !retrievalRate || !maxCapacity) {
-            addLog('Error: All fields are required');
-            return false;
+    const validateField = (name, value) => {
+        if (!value) return `${name} is required`;
+        if (isNaN(value) || Number(value) <= 0) return `${name} must be a positive number`;
+        return '';
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        Object.entries(config).forEach(([key, value]) => {
+            const error = validateField(key, value);
+            if (error) newErrors[key] = error;
+        });
+
+        if (Number(config.totalTickets) > Number(config.maxTicketCapacity)) {
+            newErrors.totalTickets = 'Total tickets cannot exceed maximum capacity';
         }
-        if (Number(totalTickets) <= 0 || Number(releaseRate) <= 0 || 
-            Number(retrievalRate) <= 0 || Number(maxCapacity) <= 0) {
-            addLog('Error: All values must be positive numbers');
-            return false;
-        }
-        if (Number(totalTickets) > Number(maxCapacity)) {
-            addLog('Error: Total tickets cannot exceed max capacity');
-            return false;
-        }
-        return true;
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setConfig(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        // Clear error when user starts typing
+        setErrors(prev => ({
+            ...prev,
+            [name]: ''
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (!validateInputs()) return;
+        if (!validateForm()) {
+            addLog('Please fix the validation errors');
+            return;
+        }
 
-        const newConfig = {
-            totalTickets: Number(totalTickets),
-            ticketReleaseRate: Number(releaseRate),
-            customerRetrievalRate: Number(retrievalRate),
-            maxTicketCapacity: Number(maxCapacity),
-        };
-
-        setIsSubmitting(true);
         try {
-            const response = await updateConfig(newConfig);
-            addLog('Configuration updated successfully');
-            // Clear form after successful submission
-            setTotalTickets('');
-            setReleaseRate('');
-            setRetrievalRate('');
-            setMaxCapacity('');
+            const response = await updateConfig({
+                totalTickets: Number(config.totalTickets),
+                ticketReleaseRate: Number(config.ticketReleaseRate),
+                customerRetrievalRate: Number(config.customerRetrievalRate),
+                maxTicketCapacity: Number(config.maxTicketCapacity)
+            });
+
+            if (response.data.success) {
+                addLog('Configuration updated successfully');
+                // Clear form
+                setConfig({
+                    totalTickets: '',
+                    ticketReleaseRate: '',
+                    customerRetrievalRate: '',
+                    maxTicketCapacity: ''
+                });
+            }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Failed to update configuration';
-            addLog(`Error: ${errorMessage}`);
-        } finally {
-            setIsSubmitting(false);
+            addLog('Failed to update configuration');
+            console.error('Configuration update error:', error);
         }
     };
 
     return (
-        <form className="configuration-form" onSubmit={handleSubmit}>
-            <h3>Configuration Form</h3>
-            <div>
-                <label>Total Tickets:</label>
-                <input 
-                    type="number" 
-                    value={totalTickets} 
-                    onChange={(e) => setTotalTickets(e.target.value)}
-                    min="1"
-                    required
-                    disabled={isSubmitting}
-                />
-            </div>
-            <div>
-                <label>Release Rate (tickets/min):</label>
-                <input 
-                    type="number" 
-                    value={releaseRate} 
-                    onChange={(e) => setReleaseRate(e.target.value)}
-                    min="1"
-                    required
-                    disabled={isSubmitting}
-                />
-            </div>
-            <div>
-                <label>Retrieval Rate (tickets/min):</label>
-                <input 
-                    type="number" 
-                    value={retrievalRate} 
-                    onChange={(e) => setRetrievalRate(e.target.value)}
-                    min="1"
-                    required
-                    disabled={isSubmitting}
-                />
-            </div>
-            <div>
-                <label>Max Capacity:</label>
-                <input 
-                    type="number" 
-                    value={maxCapacity} 
-                    onChange={(e) => setMaxCapacity(e.target.value)}
-                    min="1"
-                    required
-                    disabled={isSubmitting}
-                />
-            </div>
-            <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : 'Save Configuration'}
-            </button>
-        </form>
+        <div className="configuration-form">
+            <h3>System Configuration</h3>
+            <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label>Total Number of Tickets:</label>
+                    <input
+                        type="number"
+                        name="totalTickets"
+                        value={config.totalTickets}
+                        onChange={handleChange}
+                        placeholder="Enter total tickets"
+                    />
+                    {errors.totalTickets && <span className="error">{errors.totalTickets}</span>}
+                </div>
+
+                <div className="form-group">
+                    <label>Ticket Release Rate:</label>
+                    <input
+                        type="number"
+                        name="ticketReleaseRate"
+                        value={config.ticketReleaseRate}
+                        onChange={handleChange}
+                        placeholder="Enter release rate"
+                    />
+                    {errors.ticketReleaseRate && <span className="error">{errors.ticketReleaseRate}</span>}
+                </div>
+
+                <div className="form-group">
+                    <label>Customer Retrieval Rate:</label>
+                    <input
+                        type="number"
+                        name="customerRetrievalRate"
+                        value={config.customerRetrievalRate}
+                        onChange={handleChange}
+                        placeholder="Enter retrieval rate"
+                    />
+                    {errors.customerRetrievalRate && <span className="error">{errors.customerRetrievalRate}</span>}
+                </div>
+
+                <div className="form-group">
+                    <label>Maximum Ticket Capacity:</label>
+                    <input
+                        type="number"
+                        name="maxTicketCapacity"
+                        value={config.maxTicketCapacity}
+                        onChange={handleChange}
+                        placeholder="Enter max capacity"
+                    />
+                    {errors.maxTicketCapacity && <span className="error">{errors.maxTicketCapacity}</span>}
+                </div>
+
+                <button type="submit">Update Configuration</button>
+            </form>
+        </div>
     );
 };
 

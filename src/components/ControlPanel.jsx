@@ -1,24 +1,41 @@
 import React from 'react';
-import '../../src/assets/CSS/ControlPanel.css';
+import { startSystem, stopSystem } from '../api';
+import '../assets/CSS/ControlPanel.css';
 
 const ControlPanel = ({ isRunning, setIsRunning, addLog }) => {
-    const handleStart = () => {
-        setIsRunning(true);
-        addLog('System started.');
+    const handleStart = async () => {
+        try {
+            const response = await startSystem();
+            if (response.data.success) {
+                setIsRunning(true);
+                addLog('System started.');
+            }
+        } catch (error) {
+            console.error('Error starting system:', error);
+            addLog('Failed to start system.');
+        }
     };
 
-    const handleStop = () => {
-        setIsRunning(false);
-        addLog('System stopped.');
+    const handleStop = async () => {
+        try {
+            const response = await stopSystem();
+            if (response.data.success) {
+                setIsRunning(false);
+                addLog('System stopped.');
+            }
+        } catch (error) {
+            console.error('Error stopping system:', error);
+            addLog('Failed to stop system.');
+        }
     };
 
     return (
         <div className="control-panel">
             <button onClick={handleStart} disabled={isRunning}>
-                Start
+                Start System
             </button>
             <button onClick={handleStop} disabled={!isRunning}>
-                Stop
+                Stop System
             </button>
         </div>
     );
