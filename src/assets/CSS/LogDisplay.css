@@ -15,6 +15,9 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
 }
 
 .log-display li {
@@ -27,4 +30,23 @@
 
 .log-display li:last-child {
     border-bottom: none;
+}
+
+/* Custom scrollbar styling for webkit browsers */
+.log-display ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+.log-display ul::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.log-display ul::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.log-display ul::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
